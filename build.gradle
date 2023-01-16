@@ -1,0 +1,212 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        google()
+        jcenter()
+        maven {
+            name = "forge"
+            url = "https://maven.minecraftforge.net/"
+        }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven/'
+        }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'scala'
+
+sourceCompatibility = targetCompatibility = '17' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '17'
+}
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
+minecraft {
+    mappings channel: "official", version: "1.18.2"
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            arg '-mixin.config=ship.mixins.json'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                ship {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            arg '-mixin.config=ship.mixins.json'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                ship {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+
+            args '--mod', "ship", '--all', '--output', file('src/generated/resources/')
+
+            mods {
+                ship {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    google()
+    jcenter()
+    maven {
+        name = 'sponge'
+        url = 'https://repo.spongepowered.org/maven/'
+    }
+
+    maven{ url = 'https://jitpack.io/'}
+    maven{ url = 'https://teamopenindustry.cc/maven/'}
+    maven {
+        // location of the maven that hosts JEI files
+        name "Progwml6 maven"
+        url "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name "ModMaven"
+        url "https://modmaven.dev/"
+    }
+    maven {
+        // architectury maven
+        name "Architectury"
+        url "https://maven.architectury.dev/"
+    }
+    maven{
+        //Mirror of architectury maven
+        name "Shedaniel"
+        url "https://maven.shedaniel.me/"
+    }
+    maven {
+        //location of the maven for vazkii's mods
+        name "blamejared"
+        url "https://maven.blamejared.com/"
+    }
+
+    maven {
+        //flywheel
+        name "tterrag maven"
+        url "https://maven.tterrag.com/"
+    }
+}
+
+configurations{
+    embed
+    compile.extendsFrom(embed)
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.86'
+    runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:6.4.90")
+    runtimeOnly fg.deobf("me.shedaniel.cloth:basic-math:0.6.1")
+    compileOnly fg.deobf("me.shedaniel.quiltmc:mappings-hasher:1.0.1")
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.18.2:0.6.4-88")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.229")
+    implementation 'net.minecraftforge:Scorge:3.1.3'
+    implementation 'com.github.stephengold:Libbulletjme:17.4.0'
+    embed 'com.github.stephengold:Libbulletjme:17.4.0'
+
+
+
+
+
+
+
+
+
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor('org.spongepowered:mixin:0.8.5:processor')
+
+
+
+
+
+}
+
+mixin {
+    add sourceSets.main, "atm.refmap.json"
+    config "atm.mixins.json"
+}
+
+
+jar {
+    from {
+        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "LICENSE.txt", "META-INF/MANIFEST.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+    }
+
+}
+jar.finalizedBy('reobfJar')
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "http://yamishdoy.com:8081/repository/maven-releases/"
+            allowInsecureProtocol = true
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
