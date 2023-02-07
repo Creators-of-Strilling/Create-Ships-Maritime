@@ -1,0 +1,12 @@
+{
+  "minVersion": "0.8.5",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "ship.refmap.json",
+  "package": "com.adrikikicp.ship.mixins",
+  "mixins": [
+
+  ],
+  "client": [
+
+  ]
+}

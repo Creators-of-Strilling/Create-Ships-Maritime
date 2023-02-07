@@ -1,0 +1,35 @@
+modLoader = "kotlinforforge"
+loaderVersion="[3,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "ship"
+version = "${file.jarVersion}"
+displayName = "Create Ships and Maritime"
+authors = "Adrikikicp"
+description = '''
+A mod that adds ships to Minecraft using Create
+'''
+#logoFile = ""
+
+[[dependencies.ship]]
+modId = "forge"
+mandatory = true
+versionRange = "[40,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ship]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.18.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ship]]
+modId = "create"
+mandatory = true
+versionRange = "[0.5.0b,)"
+ordering = "AFTER"
+side = "BOTH"
